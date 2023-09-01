@@ -23,6 +23,9 @@ app.get("/lab1part2", (req, res) => {
 app.get("/lab1part3", (req, res) => {
   res.sendFile(__dirname + "/lab1part3.html");
 });
+app.get("/lab1part4", (req, res) => {
+  res.sendFile(__dirname + "/lab1part4.html");
+});
 
 //6.start the server and listen to port 3000 so we can see our homepage at http://localhost:3000 and the content of lab1part1.html at http://localhost:3000/lab1part1
 app.listen(port, () =>
