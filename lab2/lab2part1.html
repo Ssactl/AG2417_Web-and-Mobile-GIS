@@ -1,33 +1,105 @@
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
+    <title>Quick Start - Leaflet</title>
 
-	<title>Quick Start - Leaflet</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-	<meta charset="utf-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/mystyle.css" />
 
-	<link rel="stylesheet" href="mystyle.css">
+    <!-- To be updated -->
+    <link rel="stylesheet" href="/scripts/leaflet.css" crossorigin="" />
+    <script
+      src="https://code.jquery.com/jquery-3.4.1.min.js"
+      integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+      crossorigin="anonymous"
+    ></script>
+    <script src="/scripts/leaflet.js" crossorigin=""></script>
+  </head>
+  <body>
+    <div id="mapid" style="width: 600px; height: 600px"></div>
+    <script>
+      // white script here
 
-  <!-- To be updated -->
-  <link rel="stylesheet" href="TO_BE_UPDATED" crossorigin=""/>
-  <script src="TO_BE_UPDATED" crossorigin=""></script>
+      //Add Leaflet map and set the basemap layer
+      var map = L.map("mapid").setView([59.324608, 18.06736], 12);
+      // osm = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      //   attribution:
+      //     '&copy;<a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      // }).addTo(map);
 
+      //Replace the basemap with Google Map
+      googleStreets = L.tileLayer(
+        "http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
+        {
+          maxZoom: 20,
+          subdomains: ["mt0", "mt1", "mt2", "mt3"],
+        }
+      ).addTo(map);
 
+      //Add a marker, circle and a polygon to the map
+      L.marker([59.324608, 18.06736])
+        .addTo(map)
+        .bindPopup("<b>Welcome to Stockholm!</b><br/>I am a popup.")
+        .openPopup();
 
-</head>
-<body>
+      var circle = L.circle([59.346155, 18.049538], 500, {
+        color: "red ",
+        fillColor: "#f03 ",
+        fillOpacity: 0.5,
+      })
+        .addTo(map)
+        .bindPopup("I am a circle.");
 
+      var polygon = L.polygon([
+        [59.312686, 18.016798],
+        [59.330388, 18.023071],
+        [59.317601, 18.041611],
+      ])
+        .addTo(map)
+        .bindPopup("I am a polygon.");
 
+      //Add a marker at KTH with a custom icon
+      var KTHIcon = L.icon({
+        iconUrl: "/static/KTH_Logo.jpg",
 
-<div id="mapid" style="width: 600px; height: 600px;"></div>
-<script>
+        iconSize: [64, 64], // size of the icon
+        // shadowSize: [50, 64], // size of the shadow
+        iconAnchor: [22, 94], // point of the icon which will correspond to marker's location
+        // shadowAnchor: [4, 62], // the same for the shadow
+        popupAnchor: [-3, -76], // point from which the popup should open relative to the iconAnchor
+      });
+      L.marker([59.34772481062859, 18.068549123811618], {
+        icon: KTHIcon,
+      }).addTo(map);
 
-// white script here
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      //Add GeoJSON data to the map
+      function onEachFeature(feature, layer) {
+        var popupContent =
+          "<p>I started out as a GeoJSON " +
+          feature.geometry.type +
+          ", but now I'm a Leaflet vector !</p >";
+        layer.bindPopup(popupContent);
+      }
 
-</script>
+      var metroline;
 
-
-
-</body>
+      $.ajax({
+        type: "GET",
+        url: "/static/data.geojson",
+        dataType: "json",
+        async: false,
+        success: function (data) {
+          metroline = L.geoJSON(data, {
+            style: function (feature) {
+              return { color: "#438ddf" };
+            },
+            onEachFeature: onEachFeature,
+          }).addTo(map);
+        },
+      });
+    </script>
+  </body>
 </html>
