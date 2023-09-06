@@ -25,25 +25,32 @@
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////
       //1.1 Create a simple map with Leaflet
 
-      //Add Leaflet map and set the basemap layer
-      var map = L.map("mapid").setView([59.324608, 18.06736], 12);
+      // //Add Leaflet map and set the basemap layer
+      // var map = L.map("mapid", {
+      //   center: [59.324608, 18.06736],
+      //   zoom: 12,
+      //   layers: [mapboxStreets, data],
+      // });
+
+      // //create a layer control and add it to the map
+      // let layerControl = L.control.layers(baseMaps, overlayMaps).addTo(map);
+
       // osm = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       //   attribution:
       //     '&copy;<a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       // }).addTo(map);
 
       //Replace the basemap with Google Map
-      googleStreets = L.tileLayer(
-        "http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
-        {
-          maxZoom: 20,
-          subdomains: ["mt0", "mt1", "mt2", "mt3"],
-        }
-      ).addTo(map);
+      // googleStreets = L.tileLayer(
+      //   "http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
+      //   {
+      //     maxZoom: 20,
+      //     subdomains: ["mt0", "mt1", "mt2", "mt3"],
+      //   }
+      // ).addTo(map);
 
       //Add a marker, circle and a polygon to the map
-      L.marker([59.324608, 18.06736])
-        .addTo(map)
+      let welcomeMarker = L.marker([59.324608, 18.06736])
         .bindPopup("<b>Welcome to Stockholm!</b><br/>I am a popup.")
         .openPopup();
 
@@ -51,20 +58,16 @@
         color: "red ",
         fillColor: "#f03 ",
         fillOpacity: 0.5,
-      })
-        .addTo(map)
-        .bindPopup("I am a circle.");
+      }).bindPopup("I am a circle.");
 
       var polygon = L.polygon([
         [59.312686, 18.016798],
         [59.330388, 18.023071],
         [59.317601, 18.041611],
-      ])
-        .addTo(map)
-        .bindPopup("I am a polygon.");
+      ]).bindPopup("I am a polygon.");
 
       //Add a marker at KTH with a custom icon
-      var KTHIcon = L.icon({
+      let KTHIcon = L.icon({
         iconUrl: "/static/KTH_Logo.jpg",
 
         iconSize: [64, 64], // size of the icon
@@ -73,9 +76,9 @@
         // shadowAnchor: [4, 62], // the same for the shadow
         popupAnchor: [-3, -76], // point from which the popup should open relative to the iconAnchor
       });
-      L.marker([59.34772481062859, 18.068549123811618], {
+      let KTHMarker = L.marker([59.34772481062859, 18.068549123811618], {
         icon: KTHIcon,
-      }).addTo(map);
+      });
 
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////
       //1.2 Add GeoJSON data to the map
@@ -127,9 +130,52 @@
           metroline = L.geoJSON(data, {
             style: style,
             onEachFeature: onEachFeature,
-          }).addTo(map);
+          });
         },
       });
+
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      //1.4 Adding layer controls
+      //basemap layers
+      let googleStreets = L.tileLayer(
+        "http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
+        {
+          maxZoom: 20,
+          subdomains: ["mt0", "mt1", "mt2", "mt3"],
+        }
+      );
+
+      let mapboxStreets = L.tileLayer(
+        "https://api.mapbox.com/styles/v1/mapbox/streets-v9/tiles/{z}/{x}/{y}?access_token=pk.eyJ1Ijoic3NhY3RsLSIsImEiOiJjbG03bHl1cnIwMjh3M3BsbW8zOWw4ZjdrIn0.WC8fdTEipCOJjhsDRqGyTQ"
+      );
+
+      //create an object to contain the base layers
+      let baseMaps = {
+        MapboxStreets: mapboxStreets,
+        GoogleStreets: googleStreets,
+      };
+
+      //Add a layer group called data to include Marker layer, GeoJSON layer, etc
+      let data = L.layerGroup([
+        welcomeMarker,
+        circle,
+        polygon,
+        KTHMarker,
+        metroline,
+      ]);
+
+      //create an object to contain overlays
+      let overlayMaps = { data: data };
+
+      //Add Leaflet map and set the basemap layer
+      var map = L.map("mapid", {
+        center: [59.324608, 18.06736],
+        zoom: 12,
+        layers: [mapboxStreets, data],
+      });
+
+      //create a layer control and add it to the map
+      let layerControl = L.control.layers(baseMaps, overlayMaps).addTo(map);
 
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////
       //1.3 Working with Events
@@ -159,7 +205,7 @@
             props.number +
             "</b><br /><h4>Line color</h4>" +
             props.color
-          : "Hover over a state";
+          : "Hover over a line";
       };
 
       info.addTo(map);
