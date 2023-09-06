@@ -22,6 +22,9 @@
     <script>
       // white script here
 
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      //1.1 Create a simple map with Leaflet
+
       //Add Leaflet map and set the basemap layer
       var map = L.map("mapid").setView([59.324608, 18.06736], 12);
       // osm = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -75,17 +78,40 @@
       }).addTo(map);
 
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      //Add GeoJSON data to the map
-      function onEachFeature(feature, layer) {
-        var popupContent =
-          "<p>I started out as a GeoJSON " +
-          feature.geometry.type +
-          ", but now I'm a Leaflet vector !</p >";
+      //1.2 Add GeoJSON data to the map
+
+      //attch a popup to each feature when they are clicked
+      //and the popup will show its line number
+      const onEachFeature = function (feature, layer) {
+        // var popupContent =``
+        //   "<p>I started out as a GeoJSON " +
+        //   feature.geometry.type +
+        //   ", but now I'm a Leaflet vector !</p >";
+        let popupContent = `<p>My line number is ${feature.properties.number} </p>`;
         layer.bindPopup(popupContent);
-      }
+      };
+
+      //show the color of each line according to the line color stored in the Geojson data
+      const style = function (feature) {
+        // return { color: "#3c3c5d", opacity: "0.8", weight: "5" };
+        // console.log(feature.properties.color, feature.geometry);
+
+        switch (feature.properties.color) {
+          case "Green":
+            return { color: "green" };
+          case "Red":
+            return { color: "red" };
+          case "Blue":
+            return { color: "blue" };
+          default:
+            return { color: "#3c3c5d", opacity: "0.8", weight: "5" };
+        }
+      };
 
       var metroline;
 
+      //use HTTP GET request to load the geojson data
+      //and if it succeed apply the style and onEachFeature function to the data
       $.ajax({
         type: "GET",
         url: "/static/data.geojson",
@@ -93,9 +119,7 @@
         async: false,
         success: function (data) {
           metroline = L.geoJSON(data, {
-            style: function (feature) {
-              return { color: "#438ddf" };
-            },
+            style: style,
             onEachFeature: onEachFeature,
           }).addTo(map);
         },
