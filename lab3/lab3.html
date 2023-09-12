@@ -35,7 +35,7 @@
       //   }
       // ).addTo(map);
 
-      var mywms = L.tileLayer.wms(
+      var mywms1 = L.tileLayer.wms(
         "http://localhost:8080/geoserver/stockholm/wms",
         {
           layers: "Hojddata50m",
@@ -46,9 +46,9 @@
           attribution: "tockholm-dem",
         }
       );
-      map.addLayer(mywms);
+      map.addLayer(mywms1);
 
-      var mywms = L.tileLayer.wms(
+      var mywms2 = L.tileLayer.wms(
         "http://localhost:8080/geoserver/stockholm/wms",
         {
           layers: "Hojddata2m",
@@ -59,9 +59,23 @@
           attribution: "tockholm-dem",
         }
       );
-      map.addLayer(mywms);
+      map.addLayer(mywms2);
 
       //
+      let mywmsMetroline = L.tileLayer.wms(
+        "http://localhost:8080/geoserver/stockholm/wms",
+        {
+          layers: "metro_line",
+          format: "image/png ",
+          transparent: true,
+          opacity: 0.5,
+          version: "1.1.0",
+          attribution: "tockholm-dem",
+        }
+      );
+      map.addLayer(mywmsMetroline);
+
+      //scale bar
       L.control.scale((position = "bottomright")).addTo(map);
     </script>
   </body>
